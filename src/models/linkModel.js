@@ -1,30 +1,30 @@
 import pool from "../config/db.js";
 
 export async function getAllLinks() {
-  const [rows] = await pool.query('select * from links order by timestamp desc');
-  return rows
+  const result = await pool.query('SELECT * FROM links ORDER BY timestamp DESC');
+  return result.rows;
 }
 
 export async function createLink(title, url) {
-  const [result] = await pool.query(
-    'INSERT INTO links (title, url) VALUES (?, ?)',
+  const result = await pool.query(
+    'INSERT INTO links (title, url) VALUES ($1, $2) RETURNING id',
     [title, url]
   );
-  return result.insertId;
+  return result.rows[0].id;
 }
 
 export async function updateLink(id, title, url) {
-  const [result] = await pool.query(
-    'UPDATE links SET title = ?, url = ? WHERE id = ?',
+  const result = await pool.query(
+    'UPDATE links SET title = $1, url = $2 WHERE id = $3',
     [title, url, id]
   );
-  return result.affectedRows;
+  return result.rowCount;
 }
 
 export async function deleteLink(id) {
-  const [result] = await pool.query(
-    'DELETE FROM links WHERE id = ?',
+  const result = await pool.query(
+    'DELETE FROM links WHERE id = $1',
     [id]
   );
-  return result.affectedRows;
+  return result.rowCount;
 }
